@@ -1,0 +1,1087 @@
+#!/bin/bash
+# â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+# â•‘  ULTIMATE EXTERNAL RECON AUTOMATION SUITE (2025)              â•‘
+# â•‘  Full OSINT, Infrastructure Discovery & Pre-Attack Intel      â•‘
+# â•‘  Compatible: HTB, CPTS, eCPPT, OSCP, PNPT, Real Pentests     â•‘
+# â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+set -euo pipefail
+IFS=$'\n\t'
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# COLOR DEFINITIONS
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# BANNER
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+banner() {
+cat << "EOF"
+â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
+â•‘                                                              â•‘
+â•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•—              â•‘
+â•‘   â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘              â•‘
+â•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘              â•‘
+â•‘   â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•  â–ˆâ–ˆâ•‘     â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘              â•‘
+â•‘   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘ â•šâ–ˆâ–ˆâ–ˆâ–ˆâ•‘              â•‘
+â•‘   â•šâ•â•  â•šâ•â•â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â• â•šâ•â•â•â•â•â• â•šâ•â•  â•šâ•â•â•â•              â•‘
+â•‘                                                              â•‘
+â•‘        Ultimate External Reconnaissance Suite 2025           â•‘
+â•‘                    All-in-One Edition                        â•‘
+â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+EOF
+echo -e "${CYAN}[*] Comprehensive OSINT & Attack Surface Mapping${NC}\n"
+}
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# LOGGING FUNCTIONS
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_info() {
+    echo -e "${BLUE}[â„¹]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[âœ“]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[âš ]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[âœ—]${NC} $1"
+}
+
+log_phase() {
+    echo -e "\n${MAGENTA}${BOLD}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—${NC}"
+    echo -e "${MAGENTA}${BOLD}â•‘ $1${NC}"
+    echo -e "${MAGENTA}${BOLD}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•${NC}\n"
+}
+
+log_cmd() {
+    echo -e "\n${CYAN}â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®${NC}"
+    echo -e "${CYAN}â”‚${NC} ${BOLD}${YELLOW}âš¡ RUNNING:${NC} ${BOLD}$*${NC}"
+    echo -e "${CYAN}â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯${NC}"
+}
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ENHANCED RUN FUNCTION (shows command + saves output)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+run() {
+    # Display command in a highlighted box
+    echo -e "\n${CYAN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”${NC}"
+    echo -e "${CYAN}â”‚ ${YELLOW}EXECUTING COMMAND:${NC}"
+    echo -e "${CYAN}â”‚${NC} ${BOLD}$*${NC}"
+    echo -e "${CYAN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜${NC}\n"
+    
+    # Log to file
+    echo "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•" >> "$OUTDIR/full_command.log"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] COMMAND: $*" >> "$OUTDIR/full_command.log"
+    echo "â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€" >> "$OUTDIR/full_command.log"
+    
+    # Execute and capture output
+    "$@" 2>&1 | tee -a "$OUTDIR/full_command.log"
+    local ret=$?
+    
+    # Show status
+    if [ $ret -eq 0 ]; then
+        echo -e "\n${GREEN}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”${NC}"
+        echo -e "${GREEN}â”‚ âœ“ Command completed successfully (exit code: 0)            â”‚${NC}"
+        echo -e "${GREEN}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜${NC}\n"
+    else
+        echo -e "\n${YELLOW}â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”${NC}"
+        echo -e "${YELLOW}â”‚ âš  Command completed with exit code: $ret${NC}"
+        echo -e "${YELLOW}â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜${NC}\n"
+    fi
+    
+    echo "EXIT CODE: $ret" >> "$OUTDIR/full_command.log"
+    echo "" >> "$OUTDIR/full_command.log"
+    
+    return $ret
+}
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# TOOL CHECKER
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+check_tool() {
+    if command -v "$1" &> /dev/null; then
+        log_success "$1 found"
+        return 0
+    else
+        log_warning "$1 not found (skipping related tasks)"
+        return 1
+    fi
+}
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# INITIAL SETUP
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+banner
+
+read -p "$(echo -e ${CYAN}Enter target domain [e.g., example.com]: ${NC})" DOMAIN
+read -p "$(echo -e ${CYAN}Enter company/organization name [optional]: ${NC})" COMPANY
+read -p "$(echo -e ${CYAN}Output directory [default: recon_${DOMAIN}]: ${NC})" OUTDIR
+OUTDIR=${OUTDIR:-recon_${DOMAIN}}
+
+mkdir -p "$OUTDIR"/{subdomains,dns,cloud,users,documents,repos,breach,wordlists,services,screenshots}
+
+log_success "Output directory created: $(realpath "$OUTDIR")"
+echo -e "${BOLD}All commands will be logged and displayed!${NC}\n"
+
+# Start timestamp
+START_TIME=$(date +%s)
+echo "Recon started: $(date)" > "$OUTDIR/recon_summary.txt"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE A: SCOPE VALIDATION (Manual Checklist)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE A: SCOPE VALIDATION (Manual Review Required)"
+
+cat << EOF
+${RED}${BOLD}âš ï¸  CRITICAL CHECKS BEFORE PROCEEDING:${NC}
+
+1. âœ… Written authorization obtained from client?
+2. âœ… Confirmed in-scope domains/IPs/ASNs?
+3. âœ… Reviewed cloud provider pentesting policies?
+   â€¢ AWS: https://aws.amazon.com/security/penetration-testing/
+   â€¢ Azure: https://www.microsoft.com/en-us/msrc/pentest-rules-of-engagement
+   â€¢ GCP: https://support.google.com/cloud/answer/6262505
+4. âœ… Excluded shared infrastructure (Cloudflare, Akamai, etc.)?
+5. âœ… Confirmed no production disruption risk?
+
+${YELLOW}If ANY answer is NO, STOP and get proper authorization!${NC}
+EOF
+
+read -p "$(echo -e ${GREEN}Press Enter when ready to proceed...${NC})"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE B: INFRASTRUCTURE DISCOVERY
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE B: INFRASTRUCTURE DISCOVERY"
+
+# --- B.1: WHOIS & Registration Info ---
+log_info "B.1: WHOIS & Domain Registration Intel"
+if check_tool whois; then
+    run whois "$DOMAIN" > "$OUTDIR/whois.txt"
+fi
+
+# --- B.2: ASN & IP Range Discovery ---
+log_info "B.2: ASN & IP Range Enumeration"
+if check_tool whois; then
+    run whois -h whois.radb.net "v4 $DOMAIN" > "$OUTDIR/asn_ipv4.txt"
+fi
+log_info "Manual check: https://bgp.he.net/ (search for $DOMAIN)"
+
+# --- B.3: DNS Reconnaissance ---
+log_info "B.3: DNS Reconnaissance & Zone Transfers"
+if check_tool dig; then
+    echo -e "${MAGENTA}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}"
+    echo -e "${BOLD}About to run DNS reconnaissance queries...${NC}"
+    echo -e "${MAGENTA}â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”â”${NC}\n"
+    
+    run dig ANY "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dig_any.txt"
+    run dig NS "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dig_ns.txt"
+    run dig MX "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dig_mx.txt"
+    run dig TXT "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dig_txt.txt"
+    run dig AXFR "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dig_axfr.txt"
+fi
+
+# --- B.4: Subdomain Enumeration (Multiple Tools) ---
+log_info "B.4: Subdomain Discovery (Passive + Active)"
+
+if check_tool subfinder; then
+    run subfinder -d "$DOMAIN" -all -recursive -o "$OUTDIR/subdomains/subfinder.txt"
+fi
+
+if check_tool assetfinder; then
+    run assetfinder --subs-only "$DOMAIN" > "$OUTDIR/subdomains/assetfinder.txt"
+fi
+
+if check_tool amass; then
+    run amass enum -passive -d "$DOMAIN" -o "$OUTDIR/subdomains/amass_passive.txt"
+    log_info "Running Amass active scan (this may take time)..."
+    run amass enum -active -d "$DOMAIN" -o "$OUTDIR/subdomains/amass_active.txt"
+fi
+
+if check_tool chaos; then
+    run chaos -d "$DOMAIN" -o "$OUTDIR/subdomains/chaos.txt"
+fi
+
+if check_tool github-subdomains; then
+    run github-subdomains -d "$DOMAIN" -t "$GITHUB_TOKEN" -o "$OUTDIR/subdomains/github_subdomains.txt"
+fi
+
+# Combine and deduplicate all subdomains
+if ls "$OUTDIR/subdomains"/*.txt 1> /dev/null 2>&1; then
+    cat "$OUTDIR/subdomains"/*.txt | sort -u > "$OUTDIR/subdomains/all_subdomains.txt"
+    log_success "Found $(wc -l < "$OUTDIR/subdomains/all_subdomains.txt") unique subdomains"
+fi
+
+# --- B.5: DNS Brute Force ---
+log_info "B.5: DNS Brute Force (Optional)"
+if check_tool puredns; then
+    if [ -f "/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt" ]; then
+        run puredns bruteforce /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt "$DOMAIN" -r /usr/share/dnsrecon/namelist.txt -w "$OUTDIR/subdomains/puredns_bruteforce.txt"
+    fi
+fi
+
+# --- B.6: Reverse DNS / Virtual Host Discovery ---
+log_info "B.6: Reverse DNS Lookup"
+log_info "Manual check: https://viewdns.info/reverseip/?host=$DOMAIN"
+
+# --- B.7: Internet-Wide Scanning (Shodan/Censys) ---
+log_info "B.7: Shodan & Censys Intelligence"
+log_info "Manual searches recommended:"
+echo "  â€¢ Shodan: https://www.shodan.io/search?query=hostname:$DOMAIN"
+echo "  â€¢ Censys: https://search.censys.io/search?resource=hosts&q=$DOMAIN"
+
+# --- B.8: Certificate Transparency Logs ---
+log_info "B.8: Certificate Transparency (crt.sh)"
+if check_tool curl; then
+    run curl -s "https://crt.sh/?q=%.$DOMAIN&output=json" | jq -r '.[].name_value' | sort -u > "$OUTDIR/subdomains/crtsh.txt"
+fi
+
+# --- B.9: Archive Crawling (Wayback, Common Crawl) ---
+log_info "B.9: Web Archive & URL Discovery"
+if check_tool gau; then
+    run gau "$DOMAIN" --threads 5 > "$OUTDIR/gau_all_urls.txt"
+    run gau "$DOMAIN" --subs --threads 5 > "$OUTDIR/gau_subdomains_urls.txt"
+fi
+
+if check_tool waybackurls; then
+    run waybackurls "$DOMAIN" > "$OUTDIR/waybackurls.txt"
+fi
+
+# --- B.10: Cloud Footprinting ---
+log_info "B.10: Cloud Infrastructure Detection"
+
+# AWS Detection
+if [ -f "$OUTDIR/subdomains/all_subdomains.txt" ]; then
+    while IFS= read -r subdomain; do
+        if nslookup "$subdomain" 2>/dev/null | grep -q "amazonaws.com"; then
+            echo "$subdomain" >> "$OUTDIR/cloud/aws_hosts.txt"
+        fi
+    done < "$OUTDIR/subdomains/all_subdomains.txt"
+fi
+
+# S3 Bucket Discovery
+if check_tool s3scanner; then
+    run s3scanner scan --bucket "$DOMAIN" > "$OUTDIR/cloud/s3_buckets.txt"
+fi
+
+log_info "Manual check: https://buckets.grayhatwarfare.com/ (search for $DOMAIN)"
+
+# Azure Blob Detection
+log_info "Azure Blob check: https://${DOMAIN}.blob.core.windows.net/"
+
+# GCP Bucket Detection
+if check_tool gcp-scanner; then
+    run gcp-scanner -domain "$DOMAIN" > "$OUTDIR/cloud/gcp_buckets.txt"
+fi
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE C: USER & SCHEMA INTELLIGENCE
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE C: USER & SCHEMA INTELLIGENCE"
+
+# --- C.1: Email Harvesting ---
+log_info "C.1: Email Address Discovery"
+
+if check_tool theHarvester; then
+    run theHarvester -d "$DOMAIN" -b all -f "$OUTDIR/users/theharvester"
+fi
+
+if check_tool h8mail; then
+    run h8mail -t "$DOMAIN" -c h8mail_config.ini -o "$OUTDIR/users/h8mail.txt"
+fi
+
+# Google Dork for emails
+log_info "Google Dorks for emails (manual):"
+echo "  â€¢ intext:@$DOMAIN site:linkedin.com"
+echo "  â€¢ intext:@$DOMAIN filetype:pdf"
+echo "  â€¢ intext:@$DOMAIN site:github.com"
+
+# --- C.2: Username Pattern Mapping ---
+log_info "C.2: Username Schema Discovery"
+
+if check_tool linkedin2username; then
+    if [ -n "$COMPANY" ]; then
+        run linkedin2username -c "$COMPANY" -o "$OUTDIR/users/linkedin_usernames.txt"
+    fi
+fi
+
+log_info "Common patterns to test: first.last, flast, f.last, firstl, first_last"
+
+# --- C.3: Employee Enumeration ---
+log_info "C.3: Employee Intelligence Gathering"
+log_info "Manual sources to check:"
+echo "  â€¢ LinkedIn: $COMPANY employees"
+echo "  â€¢ GitHub: repos owned by $DOMAIN users"
+echo "  â€¢ Job postings: Glassdoor, Indeed, LinkedIn Jobs"
+echo "  â€¢ Conference talks/presentations"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE D: DOCUMENT LEAK HUNTING
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE D: DOCUMENT LEAK HUNTING"
+
+# --- D.1: Public File Discovery ---
+log_info "D.1: Public Document Search (Google Dorks)"
+
+declare -a filetypes=("pdf" "docx" "xlsx" "pptx" "txt" "csv" "xml" "json" "sql" "bak" "conf" "config" "env")
+
+for ft in "${filetypes[@]}"; do
+    log_info "Searching for .$ft files..."
+    echo "Google Dork: site:$DOMAIN filetype:$ft" >> "$OUTDIR/documents/google_dorks.txt"
+done
+
+# Extract documents from URLs
+if [ -f "$OUTDIR/gau_all_urls.txt" ]; then
+    grep -iE "\.(pdf|docx|xlsx|pptx|doc|xls|txt|csv)$" "$OUTDIR/gau_all_urls.txt" > "$OUTDIR/documents/interesting_files.txt" || true
+fi
+
+# --- D.2: Download & Analyze Documents ---
+log_info "D.2: Downloading & Extracting Metadata"
+
+if [ -f "$OUTDIR/documents/interesting_files.txt" ]; then
+    while IFS= read -r url; do
+        filename=$(basename "$url" | head -c 100)
+        log_cmd "wget -q --timeout=10 -O \"$OUTDIR/documents/$filename\" \"$url\""
+        wget -q --timeout=10 -O "$OUTDIR/documents/$filename" "$url" 2>/dev/null || continue
+        
+        if check_tool exiftool && [ -f "$OUTDIR/documents/$filename" ]; then
+            run exiftool "$OUTDIR/documents/$filename" > "$OUTDIR/documents/${filename}_metadata.txt"
+        fi
+    done < "$OUTDIR/documents/interesting_files.txt"
+fi
+
+# --- D.3: Extract Usernames/Paths from Metadata ---
+log_info "D.3: Analyzing metadata for intel"
+if check_tool exiftool; then
+    find "$OUTDIR/documents" -type f -name "*_metadata.txt" -exec grep -iE "(Creator|Author|User|Path|Directory)" {} \; > "$OUTDIR/documents/extracted_intel.txt" || true
+fi
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE E: CODE REPOSITORY SCANNING
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE E: CODE REPOSITORY SCANNING"
+
+# --- E.1: GitHub Repository Discovery ---
+log_info "E.1: GitHub Organization & Repository Search"
+log_info "Manual searches (requires GitHub account):"
+echo "  â€¢ https://github.com/search?q=org:$DOMAIN"
+echo "  â€¢ https://github.com/search?q=$DOMAIN+password"
+echo "  â€¢ https://github.com/search?q=$DOMAIN+api_key"
+
+if check_tool github-search; then
+    run github-search --domain "$DOMAIN" --output "$OUTDIR/repos/github_repos.txt"
+fi
+
+# --- E.2: Secret Detection in Repos ---
+log_info "E.2: Secret & Credential Scanning"
+
+if check_tool trufflehog; then
+    log_info "TruffleHog scanning (requires repo URLs)..."
+    echo "# Run manually: trufflehog git https://github.com/<org>/<repo> --only-verified" >> "$OUTDIR/repos/trufflehog_commands.txt"
+fi
+
+if check_tool gitleaks; then
+    log_info "GitLeaks scanning (requires cloned repos)..."
+    echo "# Run manually: gitleaks detect --source /path/to/repo" >> "$OUTDIR/repos/gitleaks_commands.txt"
+fi
+
+# --- E.3: GitHub Dorks ---
+log_info "E.3: Automated GitHub Dork Search"
+declare -a gh_dorks=(
+    "filename:.env"
+    "filename:config.json"
+    "filename:secrets.yml"
+    "PRIVATE_KEY"
+    "api_key"
+    "aws_secret"
+    "password"
+    "credentials"
+)
+
+for dork in "${gh_dorks[@]}"; do
+    echo "https://github.com/search?q=org:$DOMAIN+$dork" >> "$OUTDIR/repos/github_dorks.txt"
+done
+
+# --- E.4: GitLab/Bitbucket Search ---
+log_info "E.4: GitLab & Bitbucket Intelligence"
+echo "Manual checks:"
+echo "  â€¢ GitLab: https://gitlab.com/search?search=$DOMAIN"
+echo "  â€¢ Bitbucket: https://bitbucket.org/repo/all?name=$DOMAIN"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE F: BREACH INTELLIGENCE
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE F: BREACH INTELLIGENCE"
+
+# --- F.1: HaveIBeenPwned Check ---
+log_info "F.1: HaveIBeenPwned (HIBP) Check"
+log_info "Manual check: https://haveibeenpwned.com/DomainSearch"
+
+if check_tool h8mail; then
+    if [ -f "$OUTDIR/users/emails.txt" ]; then
+        run h8mail -t "$OUTDIR/users/emails.txt" --breach-check -o "$OUTDIR/breach/h8mail_results.txt"
+    fi
+fi
+
+# --- F.2: Dehashed Intelligence ---
+log_info "F.2: Dehashed Credential Search"
+log_info "Manual check (requires API key): https://www.dehashed.com/search?query=$DOMAIN"
+
+# --- F.3: Snusbase / LeakCheck ---
+log_info "F.3: Additional Breach Databases"
+echo "  â€¢ Snusbase: https://snusbase.com/"
+echo "  â€¢ LeakCheck: https://leakcheck.io/"
+echo "  â€¢ IntelX: https://intelx.io/"
+
+# --- F.4: Password Spray Preparation ---
+log_info "F.4: Preparing for Password Sprays"
+if [ -f "$OUTDIR/breach/passwords.txt" ]; then
+    sort -u "$OUTDIR/breach/passwords.txt" > "$OUTDIR/wordlists/breach_passwords.txt"
+    log_success "Breach passwords saved to $OUTDIR/wordlists/breach_passwords.txt"
+fi
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE G: VALIDATION & SERVICE MAPPING
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE G: VALIDATION & SERVICE MAPPING"
+
+# --- G.1: Live Host Detection ---
+log_info "G.1: Checking Live Hosts (HTTP/HTTPS)"
+
+if check_tool httpx; then
+    if [ -f "$OUTDIR/subdomains/all_subdomains.txt" ]; then
+        run httpx -l "$OUTDIR/subdomains/all_subdomains.txt" -threads 50 -o "$OUTDIR/services/live_hosts.txt"
+    fi
+fi
+
+# --- G.2: Technology Detection ---
+log_info "G.2: Web Technology Fingerprinting"
+
+if check_tool whatweb; then
+    if [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        run whatweb -i "$OUTDIR/services/live_hosts.txt" --log-verbose="$OUTDIR/services/whatweb.txt"
+    fi
+fi
+
+if check_tool wappalyzer; then
+    log_info "Wappalyzer (requires npm): wappalyzer <url>"
+fi
+
+# --- G.3: Screenshot Capture ---
+log_info "G.3: Web Application Screenshots"
+
+if check_tool gowitness; then
+    if [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        run gowitness file -f "$OUTDIR/services/live_hosts.txt" -P "$OUTDIR/screenshots/"
+    fi
+fi
+
+if check_tool eyewitness; then
+    if [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        run eyewitness --web -f "$OUTDIR/services/live_hosts.txt" -d "$OUTDIR/screenshots/eyewitness"
+    fi
+fi
+
+# --- G.4: Port Scanning (Nmap) ---
+log_info "G.4: Port & Service Scanning"
+
+if check_tool nmap; then
+    if [ -f "$OUTDIR/subdomains/all_subdomains.txt" ]; then
+        run nmap -iL "$OUTDIR/subdomains/all_subdomains.txt" -p- -T4 -oA "$OUTDIR/services/nmap_all_ports"
+        run nmap -iL "$OUTDIR/subdomains/all_subdomains.txt" -sV -sC -oA "$OUTDIR/services/nmap_service_scan"
+    fi
+fi
+
+# --- G.5: Service-Specific Checks ---
+log_info "G.5: Identifying Attack Surfaces"
+log_info "Common targets to manually validate:"
+echo "  â€¢ OWA/Exchange: https://autodiscover.$DOMAIN"
+echo "  â€¢ VPN: vpn.$DOMAIN, remote.$DOMAIN"
+echo "  â€¢ SharePoint: sharepoint.$DOMAIN"
+echo "  â€¢ Jenkins: jenkins.$DOMAIN"
+echo "  â€¢ GitLab: gitlab.$DOMAIN"
+echo "  â€¢ Citrix: citrix.$DOMAIN"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# PHASE H: WEAPONIZATION
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "PHASE H: WEAPONIZATION & ATTACK PREPARATION"
+
+# --- H.1: Custom Wordlist Generation ---
+log_info "H.1: Building Custom Wordlists"
+
+if check_tool cewl; then
+    if [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        FIRST_URL=$(head -1 "$OUTDIR/services/live_hosts.txt")
+        if [ -n "$FIRST_URL" ]; then
+            run cewl -m 6 -w "$OUTDIR/wordlists/cewl_wordlist.txt" "$FIRST_URL"
+        fi
+    fi
+fi
+
+# Combine all wordlists
+if ls "$OUTDIR/wordlists"/*.txt 1> /dev/null 2>&1; then
+    cat "$OUTDIR/wordlists"/*.txt | sort -u > "$OUTDIR/wordlists/master_wordlist.txt"
+fi
+
+# --- H.2: Username List Preparation ---
+log_info "H.2: Preparing Username Lists"
+if [ -f "$OUTDIR/users/emails.txt" ]; then
+    # Extract usernames from emails
+    cut -d'@' -f1 "$OUTDIR/users/emails.txt" | sort -u > "$OUTDIR/users/usernames.txt"
+fi
+
+# --- H.3: Password Spray Prep (Commands Only - DO NOT EXECUTE) ---
+log_info "H.3: Password Spray Attack Commands (Manual Execution Required)"
+
+cat << 'EOF' > "$OUTDIR/weaponization_commands.txt"
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# WEAPONIZATION COMMANDS (Execute Manually with Authorization)
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+# --- Kerberos Pre-Auth (kerbrute) ---
+kerbrute userenum -d DOMAIN --dc DC_IP usernames.txt
+kerbrute passwordspray -d DOMAIN --dc DC_IP usernames.txt 'Winter2025!'
+
+# --- SMB Password Spray (CrackMapExec) ---
+crackmapexec smb <target> -u usernames.txt -p passwords.txt --continue-on-success
+crackmapexec smb <target> -u usernames.txt -p 'Winter2025!' --continue-on-success
+
+# --- OWA/O365 Spray ---
+# Use: https://github.com/dafthack/MailSniper
+Invoke-PasswordSprayOWA -ExchHostname outlook.office365.com -UserList users.txt -Password 'Winter2025!'
+
+# --- VPN Brute Force ---
+# FortiGate, Pulse Secure, Cisco AnyConnect
+# Use hydra, patator, or vendor-specific tools
+
+# --- Jenkins/GitLab ---
+hydra -L usernames.txt -P passwords.txt <target> http-post-form "/login:username=^USER^&password=^PASS^:F=Invalid"
+
+# --- RDP Spray (careful - locks accounts!) ---
+crowbar -b rdp -s <target>/32 -U usernames.txt -C passwords.txt
+
+EOF
+
+log_success "Attack commands saved to $OUTDIR/weaponization_commands.txt"
+log_warning "DO NOT execute without proper authorization!"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# FINAL SUMMARY & REPORTING
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+log_phase "RECON COMPLETE - GENERATING SUMMARY"
+
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+cat << EOF >> "$OUTDIR/recon_summary.txt"
+
+Recon completed: $(date)
+Duration: ${DURATION}s
+
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+KEY FINDINGS SUMMARY
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+[+] Subdomains Discovered:
+    $(wc -l < "$OUTDIR/subdomains/all_subdomains.txt" 2>/dev/null || echo "0") unique subdomains
+
+[+] Live Hosts:
+    $(wc -l < "$OUTDIR/services/live_hosts.txt" 2>/dev/null || echo "0") responding hosts
+
+[+] Documents Collected:
+    $(find "$OUTDIR/documents" -type f | wc -l) files
+
+[+] User Intelligence:
+    Check: $OUTDIR/users/
+
+[+] Cloud Assets:
+    Check: $OUTDIR/cloud/
+
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+NEXT STEPS
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+1. Review $OUTDIR/weaponization_commands.txt for attack vectors
+2. Manually verify breach data from Dehashed/HIBP
+3. Test identified services (OWA, VPN, SharePoint, etc.)
+4. Analyze document metadata for internal usernames/paths
+5. Execute password sprays with authorization
+6. Pivot to internal recon upon initial access
+
+âš ï¸  All offensive actions require explicit written authorization!
+
+EOF
+
+# Display summary
+cat "$OUTDIR/recon_summary.txt"
+
+log_success "Full output saved to: $(realpath "$OUTDIR")"
+log_info "Key directories:"
+tree -L 1 "$OUTDIR" 2>/dev/null || ls -l "$OUTDIR"
+
+echo -e "\n${GREEN}${BOLD}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—${NC}"
+echo -e "${GREEN}${BOLD}â•‘         Reconnaissance Mission Accomplished! ðŸŽ¯           â•‘${NC}"
+echo -e "${GREEN}${BOLD}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•${NC}"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ADDITIONAL OSINT CHECKS
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+# Ask user if they want to run additional checks
+echo ""
+read -p "$(echo -e ${CYAN}Run additional OSINT checks? [y/N]: ${NC})" RUN_ADDITIONAL
+if [[ "$RUN_ADDITIONAL" =~ ^[Yy]$ ]]; then
+    log_phase "BONUS: ADDITIONAL OSINT & INTELLIGENCE GATHERING"
+    
+    # --- Social Media Intelligence ---
+    log_info "Social Media Footprint"
+    cat << EOF > "$OUTDIR/social_media_checks.txt"
+Manual Social Media OSINT Checks:
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+â€¢ LinkedIn: https://www.linkedin.com/company/$DOMAIN
+â€¢ Twitter/X: https://twitter.com/search?q=$DOMAIN
+â€¢ Facebook: https://www.facebook.com/search/top?q=$DOMAIN
+â€¢ Instagram: https://www.instagram.com/explore/tags/$DOMAIN
+â€¢ YouTube: https://www.youtube.com/results?search_query=$DOMAIN
+â€¢ Reddit: https://www.reddit.com/search/?q=$DOMAIN
+â€¢ Crunchbase: https://www.crunchbase.com/organization/$DOMAIN
+
+Employee Social Media:
+â€¢ Search for employees on LinkedIn
+â€¢ Check Twitter for employee tweets mentioning company
+â€¢ Look for leaked credentials in pastebin/social media posts
+EOF
+    log_success "Social media checklist created: $OUTDIR/social_media_checks.txt"
+    
+    # --- Dark Web Intelligence ---
+    log_info "Dark Web & Paste Site Intelligence"
+    cat << EOF > "$OUTDIR/darkweb_checks.txt"
+Dark Web & Paste Site Checks:
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+â€¢ Pastebin: https://psbdmp.ws/ (search for $DOMAIN)
+â€¢ Ghostbin/Pastie: Manual search
+â€¢ IntelX: https://intelx.io/ (search domain/emails)
+â€¢ Exploit.in / XSS.is forums (requires access)
+
+Tools to use:
+â€¢ pwndb (Tor-based credential search)
+â€¢ h8mail with various breach compilation modules
+EOF
+    log_success "Dark web checklist created: $OUTDIR/darkweb_checks.txt"
+    
+    # --- DNS History & Changes ---
+    log_info "Historical DNS Records"
+    if check_tool curl; then
+        log_info "Checking SecurityTrails (requires API key)..."
+        echo "API: https://securitytrails.com/domain/$DOMAIN/history/a" >> "$OUTDIR/dns/historical_records.txt"
+    fi
+    
+    # --- SSL/TLS Certificate Analysis ---
+    log_info "SSL/TLS Certificate Intelligence"
+    if check_tool sslscan && [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        head -5 "$OUTDIR/services/live_hosts.txt" | while IFS= read -r host; do
+            domain_only=$(echo "$host" | sed 's|https\?://||' | cut -d'/' -f1)
+            run sslscan "$domain_only" > "$OUTDIR/services/sslscan_${domain_only}.txt" 2>/dev/null || true
+        done
+    fi
+    
+    # --- Favicon Hash (Shodan Technique) ---
+    log_info "Favicon Hash for Shodan Correlation"
+    if check_tool python3 && [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        FIRST_URL=$(head -1 "$OUTDIR/services/live_hosts.txt")
+        cat << 'PYEOF' > /tmp/favicon_hash.py
+import mmh3
+import requests
+import codecs
+import sys
+
+url = sys.argv[1] if len(sys.argv) > 1 else "https://example.com"
+try:
+    response = requests.get(f"{url}/favicon.ico", timeout=5, verify=False)
+    favicon = codecs.encode(response.content, "base64")
+    hash_value = mmh3.hash(favicon)
+    print(f"Favicon Hash: {hash_value}")
+    print(f"Shodan Query: http.favicon.hash:{hash_value}")
+except Exception as e:
+    print(f"Error: {e}")
+PYEOF
+        if [ -n "$FIRST_URL" ]; then
+            log_cmd "python3 /tmp/favicon_hash.py $FIRST_URL"
+            python3 /tmp/favicon_hash.py "$FIRST_URL" 2>/dev/null | tee -a "$OUTDIR/services/favicon_hashes.txt" || true
+        fi
+    fi
+    
+    # --- DNSSEC Validation ---
+    log_info "DNSSEC Configuration Check"
+    if check_tool dig; then
+        run dig +dnssec "$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dnssec.txt"
+    fi
+    
+    # --- Email Security (SPF, DKIM, DMARC) ---
+    log_info "Email Security Configuration"
+    if check_tool dig; then
+        run dig TXT "$DOMAIN" @8.8.8.8 | grep -i spf > "$OUTDIR/dns/spf_record.txt" || true
+        run dig TXT "_dmarc.$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dmarc_record.txt"
+        run dig TXT "default._domainkey.$DOMAIN" @8.8.8.8 > "$OUTDIR/dns/dkim_record.txt" || true
+    fi
+    
+    # --- Network Range & BGP Info ---
+    log_info "BGP & Network Range Intelligence"
+    if check_tool whois; then
+        run whois -h whois.radb.net -- "-i origin AS$(whois $DOMAIN | grep -i 'origin as' | awk '{print $NF}' | head -1)" > "$OUTDIR/bgp_routes.txt" 2>/dev/null || true
+    fi
+    
+    # --- Mobile App Analysis ---
+    log_info "Mobile Application Discovery"
+    cat << EOF > "$OUTDIR/mobile_app_checks.txt"
+Mobile App Intelligence:
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+â€¢ iOS App Store: Search for "$COMPANY"
+â€¢ Google Play Store: Search for "$COMPANY"
+â€¢ APK mirrors: APKPure, APKMirror
+â€¢ MobSF for APK/IPA analysis (requires download)
+
+Look for:
+- Hardcoded API endpoints
+- Leaked API keys in code
+- Certificate pinning misconfigurations
+- Insecure data storage
+EOF
+    
+    # --- Technology Stack Detection ---
+    log_info "Advanced Tech Stack Detection"
+    if check_tool webanalyze && [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        head -10 "$OUTDIR/services/live_hosts.txt" | while IFS= read -r url; do
+            run webanalyze -host "$url" -output json >> "$OUTDIR/services/tech_stack.json"
+        done
+    fi
+    
+    # --- WAF Detection ---
+    log_info "Web Application Firewall Detection"
+    if check_tool wafw00f && [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        head -10 "$OUTDIR/services/live_hosts.txt" | while IFS= read -r url; do
+            run wafw00f "$url" >> "$OUTDIR/services/waf_detection.txt"
+        done
+    fi
+    
+    # --- Nuclei Vulnerability Scanning ---
+    log_info "Nuclei Template Scanning (passive checks only)"
+    if check_tool nuclei && [ -f "$OUTDIR/services/live_hosts.txt" ]; then
+        run nuclei -l "$OUTDIR/services/live_hosts.txt" -t exposures/ -t misconfiguration/ -o "$OUTDIR/services/nuclei_findings.txt"
+    fi
+    
+    log_success "Additional OSINT checks completed!"
+fi
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# GENERATE HTML REPORT
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+log_info "Generating HTML Report..."
+
+cat << 'HTMLEOF' > "$OUTDIR/recon_report.html"
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Recon Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        .content { padding: 40px; }
+        .section {
+            margin-bottom: 40px;
+            border-left: 4px solid #667eea;
+            padding-left: 20px;
+        }
+        h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number { font-size: 2.5em; font-weight: bold; }
+        .stat-label { font-size: 0.9em; opacity: 0.9; margin-top: 5px; }
+        .file-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .file-list ul { list-style: none; }
+        .file-list li {
+            padding: 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .file-list li:last-child { border-bottom: none; }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ðŸŽ¯ External Reconnaissance Report</h1>
+            <div class="subtitle">Comprehensive OSINT & Attack Surface Analysis</div>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <h2>ðŸ“Š Executive Summary</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="subdomains">0</div>
+                        <div class="stat-label">Subdomains Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="live-hosts">0</div>
+                        <div class="stat-label">Live Hosts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="documents">0</div>
+                        <div class="stat-label">Documents</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="users">0</div>
+                        <div class="stat-label">User Accounts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>ðŸ” Reconnaissance Phases Completed</h2>
+                <div class="success">
+                    <strong>âœ“ Phase A:</strong> Scope Validation<br>
+                    <strong>âœ“ Phase B:</strong> Infrastructure Discovery<br>
+                    <strong>âœ“ Phase C:</strong> User & Schema Intelligence<br>
+                    <strong>âœ“ Phase D:</strong> Document Leak Hunting<br>
+                    <strong>âœ“ Phase E:</strong> Code Repository Scanning<br>
+                    <strong>âœ“ Phase F:</strong> Breach Intelligence<br>
+                    <strong>âœ“ Phase G:</strong> Validation & Service Mapping<br>
+                    <strong>âœ“ Phase H:</strong> Weaponization Preparation
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>ðŸ“ Key Output Files</h2>
+                <div class="file-list">
+                    <ul>
+                        <li>ðŸ“‚ subdomains/all_subdomains.txt - All discovered subdomains</li>
+                        <li>ðŸ“‚ services/live_hosts.txt - Active HTTP/HTTPS hosts</li>
+                        <li>ðŸ“‚ users/ - Email addresses and usernames</li>
+                        <li>ðŸ“‚ documents/ - Downloaded files and metadata</li>
+                        <li>ðŸ“‚ cloud/ - Cloud infrastructure findings</li>
+                        <li>ðŸ“‚ wordlists/master_wordlist.txt - Custom password list</li>
+                        <li>ðŸ“‚ weaponization_commands.txt - Attack preparation commands</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>âš ï¸ Next Steps</h2>
+                <div class="warning">
+                    <strong>Critical Actions Required:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Review breach intelligence data</li>
+                        <li>Validate discovered credentials</li>
+                        <li>Analyze document metadata for internal intel</li>
+                        <li>Prepare password spray campaigns</li>
+                        <li>Test identified authentication portals</li>
+                        <li>Execute authorized penetration testing</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>ðŸ›¡ï¸ Compliance Notice</h2>
+                <div class="warning">
+                    <strong>âš ï¸ LEGAL DISCLAIMER:</strong> All offensive security activities must be authorized in writing. Unauthorized access to computer systems is illegal. This report is for authorized penetration testing only.
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Generated by Ultimate External Recon Suite 2025</p>
+            <p>Report Date: <span id="report-date"></span></p>
+        </footer>
+    </div>
+    
+    <script>
+        document.getElementById('report-date').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
+HTMLEOF
+
+log_success "HTML report generated: $OUTDIR/recon_report.html"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# TOOL INSTALLATION HELPER
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+cat << 'INSTALLEOF' > "$OUTDIR/install_tools.sh"
+#!/bin/bash
+# Tool Installation Helper Script
+# Run this to install missing reconnaissance tools
+
+echo "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+echo "       RECON TOOLS INSTALLATION HELPER (Ubuntu/Debian)"
+echo "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+
+# Update system
+sudo apt update
+
+# Basic tools
+sudo apt install -y curl wget git python3 python3-pip golang jq tree dnsutils whois nmap
+
+# Go-based tools
+echo "[+] Installing Go-based tools..."
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+go install -v github.com/tomnomnom/assetfinder@latest
+go install -v github.com/lc/gau/v2/cmd/gau@latest
+go install -v github.com/tomnomnom/waybackurls@latest
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+go install -v github.com/projectdiscovery/chaos-client/cmd/chaos@latest
+go install -v github.com/sensepost/gowitness@latest
+go install -v github.com/d3mondev/puredns/v2@latest
+
+# Python tools
+echo "[+] Installing Python-based tools..."
+pip3 install h8mail truffleHog3 censys shodan
+
+# Amass
+echo "[+] Installing Amass..."
+go install -v github.com/owasp-amass/amass/v4/...@master
+
+# theHarvester
+echo "[+] Installing theHarvester..."
+git clone https://github.com/laramies/theHarvester /opt/theHarvester
+cd /opt/theHarvester && pip3 install -r requirements.txt
+
+# CeWL
+sudo apt install -y cewl
+
+# ExifTool
+sudo apt install -y libimage-exiftool-perl
+
+# WhatWeb
+sudo apt install -y whatweb
+
+# SSLScan
+sudo apt install -y sslscan
+
+# Wafw00f
+pip3 install wafw00f
+
+# LinkedIn2Username
+pip3 install linkedin2username
+
+# Add Go bin to PATH
+echo 'export PATH=$PATH:~/go/bin' >> ~/.bashrc
+
+echo ""
+echo "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+echo "âœ… Installation complete! Run 'source ~/.bashrc' to update PATH"
+echo "â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•"
+INSTALLEOF
+
+chmod +x "$OUTDIR/install_tools.sh"
+log_success "Tool installation helper created: $OUTDIR/install_tools.sh"
+
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# FINAL OUTPUT
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+echo ""
+echo -e "${BOLD}${GREEN}â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—${NC}"
+echo -e "${BOLD}${GREEN}â•‘                    ðŸŽ‰ MISSION COMPLETE ðŸŽ‰                  â•‘${NC}"
+echo -e "${BOLD}${GREEN}â•šâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•${NC}"
+echo ""
+echo -e "${CYAN}ðŸ“Š Reconnaissance Summary:${NC}"
+echo -e "   Target: ${BOLD}$DOMAIN${NC}"
+echo -e "   Output: ${BOLD}$(realpath "$OUTDIR")${NC}"
+echo -e "   Duration: ${BOLD}${DURATION}s${NC}"
+echo ""
+echo -e "${CYAN}ðŸ“ Key Files Generated:${NC}"
+echo -e "   â€¢ Full command log: ${YELLOW}$OUTDIR/full_command.log${NC}"
+echo -e "   â€¢ Summary report: ${YELLOW}$OUTDIR/recon_summary.txt${NC}"
+echo -e "   â€¢ HTML report: ${YELLOW}$OUTDIR/recon_report.html${NC}"
+echo -e "   â€¢ Attack commands: ${YELLOW}$OUTDIR/weaponization_commands.txt${NC}"
+echo -e "   â€¢ Tool installer: ${YELLOW}$OUTDIR/install_tools.sh${NC}"
+echo ""
+echo -e "${CYAN}ðŸ”¥ Next Actions:${NC}"
+echo -e "   1. Review the HTML report in a browser"
+echo -e "   2. Analyze breach data and credentials"
+echo -e "   3. Validate attack surfaces manually"
+echo -e "   4. Execute authorized testing per weaponization_commands.txt"
+echo ""
+echo -e "${RED}âš ï¸  Legal Reminder:${NC} Only test systems you have ${BOLD}written authorization${NC} to assess!"
+echo ""â•â•â•â•
