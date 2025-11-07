@@ -1,0 +1,58 @@
+# 1) prerequisites
+apt update && apt install -y git build-essential python3-pip golang-go nodejs npm curl unzip
+
+# ensure go bin is in PATH for current session (and suggest adding to shell rc)
+export PATH=$PATH:$(go env GOPATH 2>/dev/null)/bin
+mkdir -p $(go env GOPATH 2>/dev/null)/bin
+
+# 2) APT-installable tools (quick)
+apt install -y dnsrecon naabu testssl.sh mutt || true
+
+# 3) pip3 installs (use pip3 to avoid python2)
+pip3 install --upgrade pip
+pip3 install sublist3r knockpy wafw00f shosubgo altdns paramspider gf qsreplace unfurl arjun secretfinder linkfinder trufflehog gitleaks cloud_enum s3scanner cloudbrute hibp sherlock cspscanner || true
+
+# 4) npm global installs for JS CLIs
+npm i -g wappalyzer retire  # retire = retire.js ; wappalyzer provides CLI
+
+# 5) go installs for tools commonly distributed via Go
+# (these install to $(go env GOPATH)/bin)
+go install github.com/projectdiscovery/naabu/v2/cmd/naabu@latest || true
+go install github.com/hahwul/dalfox/v2@latest || true
+go install github.com/jaeles-project/jaeles@latest || true
+go install github.com/hakluke/hakrawler@latest || true
+go install github.com/tomnomnom/gf@latest || true
+go install github.com/tomnomnom/qsreplace@latest || true
+go install github.com/owasp-amass/amass/v3/...@latest || true  # optional but useful
+
+# 6) massdns (build from source)
+if [ ! -d /opt/massdns ]; then
+  git clone https://github.com/blechschmidt/massdns.git /opt/massdns
+  (cd /opt/massdns && make) || true
+  ln -sf /opt/massdns/bin/massdns /usr/local/bin/massdns || true
+fi
+
+# 7) aquatone (go) and aquatone-like screenshot tools
+go install github.com/michenriksen/aquatone@latest || true
+
+# 8) eyewitness (Python) - try pip or git clone fallback
+pip3 install eyewitness || true
+if ! command -v eyewitness >/dev/null 2>&1; then
+  git clone https://github.com/FortyNorthSecurity/EyeWitness.git /opt/EyeWitness || true
+  # follow their README for dependencies and usage
+fi
+
+# 9) findomain (prebuilt binary)
+if ! command -v findomain >/dev/null 2>&1; then
+  curl -LO https://github.com/Findomain/Findomain/releases/latest/download/findomain-linux || true
+  chmod +x findomain-linux && mv findomain-linux /usr/local/bin/findomain || true
+fi
+
+# 10) webscreenshot / webanalyze / webscreenshot alternatives
+# webscreenshot and webanalyze are not standard apt packages; use common alternatives:
+go install github.com/maaaaz/webscreenshot@latest || true 2>/dev/null || true
+# or use aquatone / eyewitness for screenshots + web analysis
+
+# 11) final PATH reminder
+echo "If you used 'go install', ensure this is in your shell rc (e.g. ~/.bashrc):"
+echo "  export PATH=\$PATH:$(go env GOPATH 2>/dev/null)/bin"
